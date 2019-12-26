@@ -4,9 +4,11 @@
 ![cuDNN 7.3.1](https://img.shields.io/badge/cudnn-7.3.1-green.svg?style=plastic)
 ![License CC BY-NC](https://img.shields.io/badge/license-CC_BY--NC-green.svg?style=plastic)
 
-This is a port of [pbaylies/stylegan-encoder](https://github.com/pbaylies/stylegan-encoder) for [NVlabs/stylegan2](https://github.com/NVlabs/stylegan2).
+This is an experimental port of [pbaylies/stylegan-encoder](https://github.com/pbaylies/stylegan-encoder) for [NVlabs/stylegan2](https://github.com/NVlabs/stylegan2).
 
 ![Teaser image](./docs/stylegan2encoder-teaser-1024x256.png)
+
+To test this, try out the notebook.
 
 ### Original Readme
 ![Teaser image](./docs/stylegan2-teaser-1024x256.png)
