@@ -26,6 +26,7 @@ if __name__ == "__main__":
                                                LANDMARKS_MODEL_URL, cache_subdir='temp'))
     RAW_IMAGES_DIR = sys.argv[1]
     ALIGNED_IMAGES_DIR = sys.argv[2]
+    VECTOR_DIR = sys.argv[3]
 
     landmarks_detector = LandmarksDetector(landmarks_model_path)
     for img_name in [x for x in os.listdir(RAW_IMAGES_DIR) if x[0] not in '._']:
@@ -33,5 +34,6 @@ if __name__ == "__main__":
         for i, face_landmarks in enumerate(landmarks_detector.get_landmarks(raw_img_path), start=1):
             face_img_name = '%s_%02d' % (os.path.splitext(img_name)[0], i)
             aligned_face_path = os.path.join(ALIGNED_IMAGES_DIR, face_img_name)
+            vector_path = os.path.join(VECTOR_DIR, face_img_name)
             os.makedirs(ALIGNED_IMAGES_DIR, exist_ok=True)
-            image_align(raw_img_path, aligned_face_path, face_landmarks)
+            image_align(raw_img_path, aligned_face_path, vector_path, face_landmarks)

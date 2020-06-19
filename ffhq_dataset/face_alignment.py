@@ -4,7 +4,7 @@ import os
 import PIL.Image
 
 
-def image_align(src_file, dst_file, face_landmarks, output_size=1024, transform_size=4096, enable_padding=True, x_scale=1, y_scale=1, em_scale=0.1, alpha=False):
+def image_align(src_file, dst_file, vector_file, face_landmarks, output_size=1024, transform_size=4096, enable_padding=True, x_scale=1, y_scale=1, em_scale=0.1, alpha=False):
         # Align function from FFHQ dataset pre-processing step
         # https://github.com/NVlabs/ffhq-dataset/blob/master/download_ffhq.py
 
@@ -92,5 +92,4 @@ def image_align(src_file, dst_file, face_landmarks, output_size=1024, transform_
         img.save(dst_file + '.png', 'PNG')
 
         #Save face placement to later fit face back into image
-        with open(dst_file + '.npy', 'wb') as f:
-            np.save(f, np.array(face_landmarks))
+        np.save(vector_file + '.npy', np.array(face_landmarks))
