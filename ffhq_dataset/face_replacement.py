@@ -4,10 +4,12 @@ import os
 import PIL.Image
 
 
-def face_replace(src_file, face_file, face_landmarks, output_size=1024, transform_size=4096, enable_padding=True, x_scale=1, y_scale=1, em_scale=0.1, alpha=False):
+def face_replace(src_file, face_file, mask_file, face_landmarks, dst_file, output_size=1024, transform_size=4096, enable_padding=True, x_scale=1, y_scale=1, em_scale=0.1, alpha=False):
         # Align function from FFHQ dataset pre-processing step
         # https://github.com/NVlabs/ffhq-dataset/blob/master/download_ffhq.py
-
+        if not os.path.isfile(face_landmarks):
+            print('\nCannot find face landmarks.')
+            return
         lm = np.array(face_landmarks)
         lm_chin          = lm[0  : 17]  # left-right
         lm_eyebrow_left  = lm[17 : 22]  # left-right
@@ -66,13 +68,24 @@ def face_replace(src_file, face_file, face_landmarks, output_size=1024, transfor
 
         transform_inv = np.linalg.inv(transform_matrix)
 
-        background = Image.open("raw_images/IMG_8918.jpg").convert("RGB")
-        foreground = Image.open("aligned_images/IMG_8918_01.png").convert("RGB")
-        mask = Image.open("masks/IMG_8918_01.png").convert("L").resize(foreground.size).filter(ImageFilter.GaussianBlur(50))
+        if not os.path.isfile(src_file):
+            print('\nCannot find source image.')
+            return
+        background = Image.open(src_file).convert("RGB")
+
+        if not os.path.isfile(face_file):
+            print('\nCannot find generated face.')
+            return
+        foreground = Image.open(face_file).convert("RGB")
+
+        if not os.path.isfile(mask_file):
+            print('\nCannot find mask.')
+            return
+        mask = Image.open(mask_file).convert("L").resize(foreground.size).filter(ImageFilter.GaussianBlur(50))
 
         foreground = foreground.transform(background.size, PIL.Image.AFFINE, transform_inv.flatten()[:6], resample=Image.NEAREST)
         mask = mask.transform(background.size, PIL.Image.AFFINE, transform_inv.flatten()[:6], resample=Image.NEAREST)
 
         background = Image.composite(foreground,background, mask)
 
-        background.save('out.png', 'PNG')
+        background.save(dst_file, 'PNG')
