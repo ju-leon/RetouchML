@@ -1,7 +1,8 @@
 import numpy as np
 import scipy.ndimage
 import os
-import PIL.Image
+import PIL
+from PIL import Image, ImageDraw, ImageFilter
 
 
 def face_replace(src_file, face_file, mask_file, face_landmarks, dst_file, output_size=1024, transform_size=4096, enable_padding=True, x_scale=1, y_scale=1, em_scale=0.1, alpha=False):
@@ -10,7 +11,7 @@ def face_replace(src_file, face_file, mask_file, face_landmarks, dst_file, outpu
         if not os.path.isfile(face_landmarks):
             print('\nCannot find face landmarks.')
             return
-        lm = np.array(face_landmarks)
+        lm = np.load(face_landmarks)
         lm_chin          = lm[0  : 17]  # left-right
         lm_eyebrow_left  = lm[17 : 22]  # left-right
         lm_eyebrow_right = lm[22 : 27]  # left-right
