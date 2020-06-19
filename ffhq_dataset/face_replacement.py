@@ -29,68 +29,50 @@ def face_replace(src_file, face_file, face_landmarks, output_size=1024, transfor
         mouth_avg    = (mouth_left + mouth_right) * 0.5
         eye_to_mouth = mouth_avg - eye_avg
 
-        # Choose oriented crop rectangle.
-        x = eye_to_eye - np.flipud(eye_to_mouth) * [-1, 1]
-        x /= np.hypot(*x)
-        x *= max(np.hypot(*eye_to_eye) * 2.0, np.hypot(*eye_to_mouth) * 1.8)
-        x *= x_scale
-        y = np.flipud(x) * [-y_scale, y_scale]
-        c = eye_avg + eye_to_mouth * em_scale
-        quad = np.stack([c - x - y, c - x + y, c + x + y, c + x - y])
-        qsize = np.hypot(*x) * 2
+        left_eye_before = [385,485]
+        right_eye_before = [639,485]
 
-        # Load in-the-wild image.
-        if not os.path.isfile(src_file):
-            print('\nCannot find source image. Please run "--wilds" before "--align".')
-            return
-        img = PIL.Image.open(src_file).convert('RGBA').convert('RGB')
+        x1b,y1b = left_eye_before
+        x2b,y2b = right_eye_before
 
-        # Shrink.
-        shrink = int(np.floor(qsize / output_size * 0.5))
-        if shrink > 1:
-            rsize = (int(np.rint(float(img.size[0]) / shrink)), int(np.rint(float(img.size[1]) / shrink)))
-            img = img.resize(rsize, PIL.Image.ANTIALIAS)
-            quad /= shrink
-            qsize /= shrink
+        y1a, x1a = eye_left
+        y2a, x2a = eye_right
 
-        # Crop.
-        border = max(int(np.rint(qsize * 0.1)), 3)
-        crop = (int(np.floor(min(quad[:,0]))), int(np.floor(min(quad[:,1]))), int(np.ceil(max(quad[:,0]))), int(np.ceil(max(quad[:,1]))))
-        crop = (max(crop[0] - border, 0), max(crop[1] - border, 0), min(crop[2] + border, img.size[0]), min(crop[3] + border, img.size[1]))
-        if crop[2] - crop[0] < img.size[0] or crop[3] - crop[1] < img.size[1]:
-            img = img.crop(crop)
-            quad -= crop[0:2]
+        #Generate linear system to compute transformation
+        a = np.matrix([
+            [-y1b,x1b, 0, 1],
+            [x1b, y1b, 1, 0],
+            [-y2b,x2b, 0, 1],
+            [x2b, y2b, 1, 0]
+        ])
 
-        # Pad.
-        pad = (int(np.floor(min(quad[:,0]))), int(np.floor(min(quad[:,1]))), int(np.ceil(max(quad[:,0]))), int(np.ceil(max(quad[:,1]))))
-        pad = (max(-pad[0] + border, 0), max(-pad[1] + border, 0), max(pad[2] - img.size[0] + border, 0), max(pad[3] - img.size[1] + border, 0))
-        if enable_padding and max(pad) > border - 4:
-            pad = np.maximum(pad, int(np.rint(qsize * 0.3)))
-            img = np.pad(np.float32(img), ((pad[1], pad[3]), (pad[0], pad[2]), (0, 0)), 'reflect')
-            h, w, _ = img.shape
-            y, x, _ = np.ogrid[:h, :w, :1]
-            mask = np.maximum(1.0 - np.minimum(np.float32(x) / pad[0], np.float32(w-1-x) / pad[2]), 1.0 - np.minimum(np.float32(y) / pad[1], np.float32(h-1-y) / pad[3]))
-            blur = qsize * 0.02
-            img += (scipy.ndimage.gaussian_filter(img, [blur, blur, 0]) - img) * np.clip(mask * 3.0 + 1.0, 0.0, 1.0)
-            img += (np.median(img, axis=(0,1)) - img) * np.clip(mask, 0.0, 1.0)
-            img = np.uint8(np.clip(np.rint(img), 0, 255))
-            if alpha:
-                mask = 1-np.clip(3.0 * mask, 0.0, 1.0)
-                mask = np.uint8(np.clip(np.rint(mask*255), 0, 255))
-                img = np.concatenate((img, mask), axis=2)
-                img = PIL.Image.fromarray(img, 'RGBA')
-            else:
-                img = PIL.Image.fromarray(img, 'RGB')
-            quad += pad[:2]
+        b = np.array([y1a,x1a,y2a,x2a])
 
-        # Transform.
-        img = img.transform((transform_size, transform_size), PIL.Image.QUAD, (quad + 0.5).flatten(), PIL.Image.BILINEAR)
-        if output_size < transform_size:
-            img = img.resize((output_size, output_size), PIL.Image.ANTIALIAS)
+        #Solve linear system
+        x = np.linalg.solve(a, b)
 
-        # Save aligned image.
-        img.save(dst_file + '.png', 'PNG')
+        #Calc transformation matrix
+        transform_matrix = np.matrix([
+            [x[1], -x[0], x[3]],
+            [x[0],  x[1], x[2]],
+            [0, 0, 1]
+        ])
 
-        #Save face placement to later fit face back into image
-        with open(dst_file + '.npy', 'wb') as f:
-            np.save(f, np.array(face_landmarks))
+        transform_matrix= np.array([
+            [x[1],-x[0],x[3]],
+            [x[0],x[1],x[2]],
+            [0,0,1]
+        ])
+
+        transform_inv = np.linalg.inv(transform_matrix)
+
+        background = Image.open("raw_images/IMG_8918.jpg").convert("RGB")
+        foreground = Image.open("aligned_images/IMG_8918_01.png").convert("RGB")
+        mask = Image.open("masks/IMG_8918_01.png").convert("L").resize(foreground.size).filter(ImageFilter.GaussianBlur(50))
+
+        foreground = foreground.transform(background.size, PIL.Image.AFFINE, transform_inv.flatten()[:6], resample=Image.NEAREST)
+        mask = mask.transform(background.size, PIL.Image.AFFINE, transform_inv.flatten()[:6], resample=Image.NEAREST)
+
+        background = Image.composite(foreground,background, mask)
+
+        background.save('out.png', 'PNG')
