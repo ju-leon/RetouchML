@@ -32,8 +32,8 @@ def face_replace(src_file, face_file, mask_file, face_landmarks, generated_image
         mouth_avg    = (mouth_left + mouth_right) * 0.5
         eye_to_mouth = mouth_avg - eye_avg
 
-        left_eye_before = [385,485]
-        right_eye_before = [639,485]
+        left_eye_before = np.mean(generated_image_landmarks[36 : 42], axis=0)
+        right_eye_before = np.mean(generated_image_landmarks[42 : 48], axis=0)
 
         x1b,y1b = left_eye_before
         x2b,y2b = right_eye_before
@@ -82,7 +82,7 @@ def face_replace(src_file, face_file, mask_file, face_landmarks, generated_image
         if not os.path.isfile(mask_file):
             print('\nCannot find mask.')
             return
-        mask = Image.open(mask_file).convert("L").resize(foreground.size).filter(ImageFilter.GaussianBlur(50))
+        mask = Image.open(mask_file).convert("L").resize(foreground.size).filter(ImageFilter.GaussianBlur(20))
 
         foreground = foreground.transform(background.size, PIL.Image.AFFINE, transform_inv.flatten()[:6], resample=Image.NEAREST)
 
