@@ -195,7 +195,11 @@ class PerceptualModel:
         from imutils import face_utils
         import cv2
         rects = self.detector(im, 1)
+        print("Rects:")
+        print(rects)
         # loop over the face detections
+
+
         for (j, rect) in enumerate(rects):
             """
             Determine the facial landmarks for the face region, then convert the facial landmark (x, y)-coordinates to a NumPy array
@@ -207,18 +211,24 @@ class PerceptualModel:
             vertices = cv2.convexHull(shape)
             mask = np.zeros(im.shape[:2],np.uint8)
             cv2.fillConvexPoly(mask, vertices, 1)
-            if self.use_grabcut:
-                bgdModel = np.zeros((1,65),np.float64)
-                fgdModel = np.zeros((1,65),np.float64)
-                rect = (0,0,im.shape[1],im.shape[2])
-                (x,y),radius = cv2.minEnclosingCircle(vertices)
-                center = (int(x),int(y))
-                radius = int(radius*self.scale_mask)
-                mask = cv2.circle(mask,center,radius,cv2.GC_PR_FGD,-1)
-                cv2.fillConvexPoly(mask, vertices, cv2.GC_FGD)
-                cv2.grabCut(im,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_MASK)
-                mask = np.where((mask==2)|(mask==0),0,1)
-            return mask
+
+            bgdModel = np.zeros((1,65),np.float64)
+            fgdModel = np.zeros((1,65),np.float64)
+            rect = (0,0,im.shape[1],im.shape[2])
+            (x,y),radius = cv2.minEnclosingCircle(vertices)
+            center = (int(x),int(y))
+            radius = int(radius*self.scale_mask)
+            mask = cv2.circle(mask,center,radius,cv2.GC_PR_FGD,-1)
+            cv2.fillConvexPoly(mask, vertices, cv2.GC_FGD) #cv2.fillConvexPoly(mask, vertices, cv2.GC_FGD)
+            mask, bgdModel, fgdModel = cv2.grabCut(im,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_MASK)
+            mask = np.where((mask==2)|(mask==0),0,1)
+
+            #Use tight mask on the chin, while using hair excluding(feature based) mask on the upper two thirds
+            maskChin = np.zeros(im.shape[:2],np.uint8)
+            cv2.fillConvexPoly(maskChin, vertices.reshape(1,-1,2), 1) #cv2.fillConvexPoly(mask, vertices, 1)
+            maskChin[:int((im.shape[0]/3) * 2)] = mask[:int((im.shape[0]/3) * 2)]
+
+            return maskChin
 
     def set_reference_images(self, images_list):
         assert(len(images_list) != 0 and len(images_list) <= self.batch_size)
