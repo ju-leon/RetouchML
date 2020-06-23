@@ -12,7 +12,7 @@ Afterwards, the vector will be optimized to "beautify" the face.
 
 The face is then stiched back into the original image.
 
-##Before/After examples:
+## Before/After examples:
 
 ![merkel-ba](docs/merkel-ba.png)
 
