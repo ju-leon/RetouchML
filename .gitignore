@@ -2,3 +2,10 @@
 *.DS_Store
 *__pycache__/
 cache
+aligned_images/
+alignement_vector/
+generated_images/
+latent_representations/
+masks/
+out/
+raw_images/
