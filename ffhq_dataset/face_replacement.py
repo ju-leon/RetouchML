@@ -77,4 +77,4 @@ def face_replace(src_file, face_file, mask_file, face_landmarks, generated_image
 
     background = Image.composite(foreground, background, mask)
 
-    background.save(dst_file, "JPG")
+    background.save(dst_file)
