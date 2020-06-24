@@ -38,7 +38,7 @@ The ResNet used for "Beauty-Prediciton" seems to favour younger faces over older
 
 Skin is also smoothed in the process, this however could also be to limitiations of the encoder or the StyleGan.
 
-As can be seen in the second picture of myself, blue eyes seem to be perferable too. Maybe i should wear contact lenses from now 👀
+As can be seen in the second picture, blue eyes seem to be perferable too. Maybe i should wear contact lenses from now 👀
 
 
 
