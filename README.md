@@ -12,7 +12,7 @@ Afterwards, the vector will be optimized to "beautify" the face.
 
 The face is then stiched back into the original image.
 
-##Before/After examples:
+## Before/After examples:
 
 ![merkel-ba](docs/merkel-ba.png)
 
@@ -36,9 +36,9 @@ Scaling the latent vector into the direction will make the face become "prettier
 
 The ResNet used for "Beauty-Prediciton" seems to favour younger faces over older faces. In most test runs the optimization will try to make the face appear younger.
 
-Skin is also smoothed in the process, this however could also be to limitiations of the encoder oder the StyleGan.
+Skin is also smoothed in the process, this however could also be to limitiations of the encoder or the StyleGan.
 
-As can be seen in the second picture of myself, blue eyes seem to be perferable too. Maybe i should waer contac lenses from now 👀
+As can be seen in the second picture, blue eyes seem to be perferable too. Maybe i should wear contact lenses from now 👀
 
 
 
