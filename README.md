@@ -18,10 +18,6 @@ The face is then stiched back into the original image.
 
 © Raimond Spekking / CC BY-SA 4.0
 
-![me-ba](docs/me-ba.png)
-
-
-
 ## How does it work?
 
 All the faces on the images are found and encoded into StyleGan2 using as slightly modified Version of [StyleGan2 Encoder](https://github.com/robertluxemburg/stylegan2encoder.git).
@@ -37,12 +33,6 @@ Scaling the latent vector into the direction will make the face become "prettier
 The ResNet used for "Beauty-Prediciton" seems to favour younger faces over older faces. In most test runs the optimization will try to make the face appear younger.
 
 Skin is also smoothed in the process, this however could also be to limitiations of the encoder or the StyleGan.
-
-As can be seen in the second picture, blue eyes seem to be perferable too. Maybe i should wear contact lenses from now 👀
-
-
-
-
 
 ## Want to try it for yourself?
 
