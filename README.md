@@ -20,7 +20,7 @@ All after images were generated entirely without human input.
 
 `© Raimond Spekking / CC BY-SA 4.0​`
 
-![stock-ba](docs/stock-ba.png)
+![pexel-ba](docs/pexel-ba.png)
 
 ![couco-ba](docs/couco-ba.png)
 
