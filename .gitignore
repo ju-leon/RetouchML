@@ -10,3 +10,11 @@ masks/
 out/
 raw_images/
 .stylegan2-cache/
+
+dnnlib/tflib/_cudacache/
+
+neural_gen/
+
+videos/
+
+models/
