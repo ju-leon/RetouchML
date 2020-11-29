@@ -14,33 +14,43 @@ The face is then stiched back into the original image.
 
 ## Before/After examples:
 
+All after images were generated entirely without human input.
+
 ![merkel-ba](docs/merkel-ba.png)
 
-© Raimond Spekking / CC BY-SA 4.0
+`© Raimond Spekking / CC BY-SA 4.0​`
 
-![me-ba](docs/me-ba.png)
+![pexel-ba](docs/pexel-ba.png)
+
+![couco-ba](docs/couco-ba.png)
+
+`© Gage Skidmore / CC BY-SA 3.0`
 
 
 
 ## How does it work?
 
-All the faces on the images are found and encoded into StyleGan2 using as slightly modified Version of [StyleGan2 Encoder](https://github.com/robertluxemburg/stylegan2encoder.git).
+![process](docs/process.png)
 
-The vectors encoded into latent space are then optimized.
+### 1. Latent space encoding
 
-A second custom-trained Residual Network judging face attractiveness is used to find the direction of steepest ascend. By slightly changing the original latent vector into each dimension, then predicting the attrqactiveness again, the gradient can be build. This direction correspond to the direction in which the ResNet thinks the face will get "prettier". 
-
-Scaling the latent vector into the direction will make the face become "prettier"(at least in the eyes of our ResNet 😅 ).
-
-### Preferences of the ResNet
-
-The ResNet used for "Beauty-Prediciton" seems to favour younger faces over older faces. In most test runs the optimization will try to make the face appear younger.
-
-Skin is also smoothed in the process, this however could also be to limitiations of the encoder or the StyleGan.
-
-As can be seen in the second picture, blue eyes seem to be perferable too. Maybe i should wear contact lenses from now 👀
+First, the image is encoded into latent space. A latent vector is found that closely represents out input image. The encoder used is based on [StyleGan2 Encoder](https://github.com/robertluxemburg/stylegan2encoder.git).
 
 
+
+### 2. Latent vector optimisation
+
+Now to the fun part. Using a neural network that judges attractiveness of latent vectors, that face is optimized by the neural network. 
+
+Using a gradient ascent approach, the latent vector is slightly changed in the direction of steepest ascent, meaning we "make our face pretty".
+
+We'll get a new latent vector that generates a "prettier" version of the original face.
+
+
+
+### 3. Generate output image
+
+The new latent vector is now converted back into an image by StyleGan2. The generated image is then stiched back into the original image.
 
 
 
