@@ -31,7 +31,7 @@ All after images were generated entirely without human input.
 
 Latent space representations allow for manual changes to the output image.
 
-![manual](docs/merkel-change.png)
+![manual](docs/merkel-change.gif)
 
 ## How does it work?
 
