@@ -18,3 +18,5 @@ neural_gen/
 videos/
 
 models/
+
+*.npy
