@@ -27,6 +27,11 @@ All after images were generated entirely without human input.
 `© Gage Skidmore / CC BY-SA 3.0`
 
 
+## Manual Editing
+
+Latent space representations allow for manual changes to the output image.
+
+![manual](docs/merkel-change.png)
 
 ## How does it work?
 
